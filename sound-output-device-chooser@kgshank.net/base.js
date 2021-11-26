@@ -3,12 +3,12 @@
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see http://www.gnu.org/licenses/.
  * *****************************************************************************
@@ -245,9 +245,9 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
     _onControlStateChanged(control) {
         if (control.get_state() == Gvc.MixerControlState.READY) {
 
-            this._signalManager.addSignal(control, this.deviceType + "-added", this._deviceAdded.bind(this));
+            this._signalManager.addSignal(control, this.deviceType + "-added", this._deviceAddedCallback.bind(this));
             this._signalManager.addSignal(control, this.deviceType + "-removed", this._deviceRemoved.bind(this));
-            this._signalManager.addSignal(control, "active-" + this.deviceType + "-update", this._deviceActivated.bind(this));
+            this._signalManager.addSignal(control, "active-" + this.deviceType + "-update", this._deviceActivatedCallback.bind(this));
 
             this._signalManager.addSignal(this._settings, "changed::" + Prefs.HIDE_ON_SINGLE_DEVICE, this._setChooserVisibility.bind(this));
             this._signalManager.addSignal(this._settings, "changed::" + Prefs.SHOW_PROFILES, this._setProfileVisibility.bind(this));
@@ -303,6 +303,14 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
         }
         else {          // Actions when submenu is closing
         }
+    }
+
+    _deviceAddedCallback(control, id, dontcheck) {
+        let _this = this;
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, function() {
+            _d("Adding after 1 second");
+            _this._deviceAdded(control, id, dontcheck);
+        });
     }
 
     _deviceAdded(control, id, dontcheck) {
@@ -407,7 +415,7 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
                    let device = Object.keys(this._devices).map((id) => this._devices[id]).find(({active}) => active === true);
                    if(device){
                        this._changeDeviceBase(device.id, this._getMixerControl());
-                   }                    
+                   }
                }
                this.deviceRemovedTimout = null;
                return false;
@@ -416,6 +424,15 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
             this._setChooserVisibility();
             this._setVisibility();
         }
+    }
+
+    _deviceActivatedCallback(control, id) {
+        _d("this is " + this);
+        let _this = this;
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, function() {
+            _d("Activating after 1 second");
+            _this._deviceActivated(control, id);
+        });
     }
 
     _deviceActivated(control, id) {
