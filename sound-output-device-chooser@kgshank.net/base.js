@@ -307,7 +307,7 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
 
     _deviceAddedCallback(control, id, dontcheck) {
         let _this = this;
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, function() {
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2500, function() {
             _d("Adding after 1 second");
             _this._deviceAdded(control, id, dontcheck);
         });
@@ -429,7 +429,7 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
     _deviceActivatedCallback(control, id) {
         _d("this is " + this);
         let _this = this;
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1500, function() {
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 2500, function() {
             _d("Activating after 1 second");
             _this._deviceActivated(control, id);
         });
@@ -572,12 +572,12 @@ var SoundDeviceChooserBase = class SoundDeviceChooserBase {
         else
             // if setting says to show device, check for any device, otherwise
             // hide the "actor"
-            this.setVisible(this._getDeviceVisibility());        
+            this.setVisible(this._getDeviceVisibility());
     }
-    
+
     setVisible(visibility) {
         getActor(this.menuItem).visible = visibility;
-        //this.emit('update-visibility', visibility);    
+        //this.emit('update-visibility', visibility);
     }
 
     _setProfileVisibility() {
