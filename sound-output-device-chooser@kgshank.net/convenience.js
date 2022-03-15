@@ -3,12 +3,12 @@
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  * *****************************************************************************
@@ -114,6 +114,12 @@ function refreshCards() {
     }
 
     if (newProfLogic) {
+        _log("Calling pactl before");
+        const env = GLib.environ_setenv(GLib.get_environ(), "LANG", "C", true);
+        let [result, out, err, exit_code] = GLib.spawn_sync(null, ["pactl", "list", "cards"], env, GLib.SpawnFlags.SEARCH_PATH, null);
+        _log("out:");
+        _log(out);
+        _log("--- 000 ---");
         _log("New logic");
         let pyLocation = Me.dir.get_child("utils/pa_helper.py").get_path();
         let pythonExec = ["python", "python3", "python2"].find(cmd => isCmdFound(cmd));
@@ -133,6 +139,8 @@ function refreshCards() {
                     if (out instanceof Uint8Array) {
                         out = ByteArray.toString(out);
                     }
+                    _log('Output:');
+                    _log(out);
                     let obj = JSON.parse(out);
                     cards = obj["cards"];
                     ports = obj["ports"];

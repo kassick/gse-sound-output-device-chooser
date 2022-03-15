@@ -23,7 +23,7 @@ import time
 from json import dumps
 
 class PAHelper():
-    
+
     _error = {
         'success': False,
         'error': None,
@@ -57,12 +57,16 @@ class PAHelper():
                              self._pa_card_info_cb_t , None)
 
             pa.pa_mainloop_iterate(self.mainloop, 0, byref(retVal))
-        print(dumps({'cards': self._cards, 'ports':self._ports}, indent = 5))
-        
-        try:    
+        result_dict = {'cards': self._cards, 'ports':self._ports}
+        from pprint import pprint
+        pprint(result_dict, stream=sys.stderr)
+        result = dumps(result_dict, indent = 5)
+        print(result)
+
+        try:
             if operation:
                 pa.pa_operation_unref(operation)
-                    
+
             pa.pa_context_disconnect(self._context)
             pa.pa_context_unref(self._context)
             pa.pa_mainloop_free(self.mainloop)
@@ -70,7 +74,7 @@ class PAHelper():
             pass
 
     def pa_card_info_cb(self, context, card_info, eol, whatever):
-        
+
         if not card_info or not card_info[0]:
             return
 
@@ -79,24 +83,24 @@ class PAHelper():
         card_obj = {}
         card_obj['index'] = str(card.index)
         self._cards[card.index] = card_obj
-        card_obj['profiles'] = [] 
-        
+        card_obj['profiles'] = []
+
         card_name = cast(pa.pa_proplist_gets(card.proplist,c_char_p(b'alsa.card_name')),c_char_p)
         card_obj['alsa_name'] = card_name.value.decode('utf8') if card_name else ''
         description = cast(pa.pa_proplist_gets(card.proplist,c_char_p(b'device.description')),c_char_p)
         card_obj['card_description'] = description.value.decode('utf8') if description else ''
-        
+
         card_obj['name'] = card.name.decode('utf8') if card.name else ''
         for k in range(0, card.n_profiles):
             if(card.profiles2[k]):
-                profile = card.profiles2[k].contents 
+                profile = card.profiles2[k].contents
                 pobj = {}
                 pobj['name'] = profile.name.decode('utf8') if profile.name  else ''
                 pobj['human_name'] = profile.description.decode('utf8') if profile.description  else ''
                 pobj['available'] = profile.available
                 card_obj['profiles'].append(pobj)
-                
-        card_obj['ports'] = []        
+
+        card_obj['ports'] = []
         for i in range(0, card.n_ports):
             port = card.ports[i].contents
 #             print ("Port name "+ str(port.name))
@@ -111,7 +115,7 @@ class PAHelper():
             obj['card_description'] = card_obj['card_description']
             for j in range(0, port.n_profiles):
                 if(port.profiles2[j]):
-                    profile = port.profiles2[j].contents 
+                    profile = port.profiles2[j].contents
 #                     pobj = {}
 #                     pobj['name'] = profile.name.decode('utf8') if profile.name  else ''
 #                     pobj['human_name'] = profile.description.decode('utf8') if profile.description  else ''
@@ -122,20 +126,18 @@ class PAHelper():
 
             self._ports.append(obj)
             card_obj['ports'].append(obj)
-        
-        
-        
+
+
+
         self._opn_completed = True
 
 
     def pa_context_notify_cb_t(self, context, userdata):
         try:
             self._pa_state = pa.pa_context_get_state(context)
-            
+
         except Exception:
             self._pa_state = pa.PA_CONTEXT_FAILED
-        
+
 
 PAHelper().print_card_info()
-            
-

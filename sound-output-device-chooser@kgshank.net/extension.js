@@ -3,12 +3,12 @@
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
  * *****************************************************************************
@@ -82,7 +82,7 @@ var VolumeMenuInstance = class VolumeMenuInstance {
             + Prefs.SHOW_INPUT_SLIDER, this._setSliderVisiblity.bind(this));
     }
     _overrideFunctions() {
-        // Fix the indicator when using SHOW_INPUT_SLIDER. 
+        // Fix the indicator when using SHOW_INPUT_SLIDER.
         // If not applied when SHOW_INPUT_SLIDER=True indication of mic being used will be on (even when not used)
         this._volumeMenu._getInputVisibleOriginal = this._volumeMenu.getInputVisible;
         this._volumeMenu._getInputVisibleCustom = function() {
@@ -206,8 +206,10 @@ var SDCInstance = class SDCInstance {
     _updateMenuVisibility(menuInstance, visible) {
         if (menuInstance instanceof SoundOutputDeviceChooser) {
             this._integrateMenu(this._volumeMenu, getActor(this._volumeMenu._output.item), getActor(menuInstance.menuItem), visible);
-        } else {
+        } else if (menuInstance) {
             this._integrateMenu(this._volumeMenu, getActor(this._volumeMenu._input.item), getActor(menuInstance.menuItem), visible);
+        } else {
+            _d("menuInstance is null, don't know what to do here");
         }
     }
 
